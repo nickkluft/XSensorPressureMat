@@ -7,7 +7,7 @@ Loading and evaluating XSensor pressure mat data
     
     Date/Time Fields - Frame Timestamp 
     
-    Center of Pressure Coordniates: Rel to upper-left conrener of sensor
+    Center of Pressure Coordniates: Rel to upper-left cornner of sensor
     
 *Files in repository:
 
