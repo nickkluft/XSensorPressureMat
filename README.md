@@ -9,11 +9,13 @@ Loading and evaluating XSensor pressure mat data
     
     Center of Pressure Coordniates: Rel to upper-left conrener of sensor
     
+*Files in repository:
 
-load_pressuremat.m : Function to load the csv output of the XSENSOR pressure mat
-plot_pressuremat.m : Function to plot the loaded data from load_pressuremat.m
+    load_pressuremat.m : Function to load the csv output of the XSENSOR pressure mat
+    
+    plot_pressuremat.m : Function to plot the loaded data from load_pressuremat.m
 
-Nick Kluft, 2020
+Created by Nick Kluft, 2020
 
 GNU GENERAL PUBLIC LICENSE
 Copyright (C) 1989, 1991 Free Software Foundation, Inc.,
