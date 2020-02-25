@@ -6,7 +6,7 @@ Loading and evaluating XSensor pressure mat data
     Date/Time Fields - Frame Timestamp
     Center of Pressure Coordniates: Rel to upper-left conrener of sensor
 
-1oad_pressuremat.m : Function to load the csv output of the XSENSOR pressure mat
+load_pressuremat.m : Function to load the csv output of the XSENSOR pressure mat
 plot_pressuremat.m : Function to plot the loaded data from load_pressuremat.m
 
 Nick Kluft, 2020
