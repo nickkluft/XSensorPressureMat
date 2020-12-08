@@ -12,13 +12,19 @@ function [out] = load_pressuremat(varargin)
 % OUTPUT
 %       out     = structure with file description and data (i.e., out.data)
 %
-% Nick Kluft, 2020
-%
 % Credits: ligth-weight textprogressbar.m [using nested Matlab functions,
 % renders more quickly than the build in object oriented function]
 % megas (2020). textprogressbar https://www.github.com/megasthenis/...
 %                       textprogressbar), GitHub. Retrieved March 3, 2020.
 %
+% Created by Nick Kluft, 2020 [TU Delft]
+% 
+% GNU GENERAL PUBLIC LICENSE
+% Copyright (C) 1989, 1991 Free Software Foundation, Inc.,
+% 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+% Everyone is permitted to copy and distribute verbatim copies
+% of this license document, but changing it is not allowed.
+% 
 % % % % % % % % % % % % % T U D E L F T % % % % % % % % % % % % % % % % %
 
 out = [];

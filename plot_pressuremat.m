@@ -1,5 +1,23 @@
 function guis = plot_pressuremat(pres)
 % Function to plot the pressure data nicely
+% FUCTION:
+%     plot_pressuremat(presdat)
+%     guis = plot_pressuremat(presdat)
+% INPUT:
+%     presdat : pressuremat data retrieved from load_pressuremat.m 
+%               (or from batchexport_pressuremat.m)
+% OUTPUT:
+%     guis : handles to figure
+% 
+% Created by Nick Kluft, 2020 [TU Delft]
+% 
+% GNU GENERAL PUBLIC LICENSE
+% Copyright (C) 1989, 1991 Free Software Foundation, Inc.,
+% 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+% Everyone is permitted to copy and distribute verbatim copies
+% of this license document, but changing it is not allowed.
+
+
 % starting frame
 i_fr = 1;
 nframes = size(pres.data,3);
