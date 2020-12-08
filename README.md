@@ -14,6 +14,11 @@ Loading and evaluating XSensor pressure mat data
     load_pressuremat.m : Function to load the csv output of the XSENSOR pressure mat
     
     plot_pressuremat.m : Function to plot the loaded data from load_pressuremat.m
+    
+    batchexport_pressuremat.m : Function to export a full folder to Matlab mat files 
+    (saves exported files to mat files with the same name and in the same folder)
+    
+    trim_presdat : Function to trim the data to a certain samples
 
 Created by Nick Kluft, 2020
 
