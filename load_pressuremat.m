@@ -1,4 +1,4 @@
-function [out] = load_pressuremat(filenm)
+function [out] = load_pressuremat(varargin)
 % Function to load the csv output of the XSENSOR pressure mat
 % Export settings Xsensor Pro software:
 % CSV/Text Format  - PRO 7 REV 1 (*.CSV export)
@@ -22,6 +22,13 @@ function [out] = load_pressuremat(filenm)
 % % % % % % % % % % % % % T U D E L F T % % % % % % % % % % % % % % % % %
 
 out = [];
+if isempty(varargin)
+    [uifile,uifold] = uigetfile([cd,filesep,'*.csv']);
+    filenm = [uifold,uifile];
+else
+    filenm = varargin{1};
+end
+
 % Check validity of input variable
 if ~exist(filenm,'file')
     disp([filenm,': file does not exist!'])
@@ -45,7 +52,9 @@ fclose(fid_temp);
 
 %% open file now
 fid = fopen(filenm,'r');
+datastring = 'data';
 out.data = [];
+sens = [];
 % counters
 iframe = 0;% frame number
 frameplus = 1;
@@ -57,21 +66,21 @@ if exist('textprogressbar.m','file')
     disprog =true;
     upd = textprogressbar(flength,'updatestep',1e6);
 else
-    disp('If you like a lightweight progressbar to run with this code')
+    disp('If you would like a lightweight progressbar to run with this code')
     disp('get it from: https://www.github.com/megasthenis/textprogressbar')
 end
 
 while ~feof(fid) % continue till end of file
     tline = fgetl(fid); % get first line
     if numel(tline)>100 % data line longer than 100 chars
-        if isempty(out.data)
+        if isempty(out.(datastring))
             % get an estimate of size out.data
             % tot lines reserved for data = 9084;
             ndim3 = round(flength/(9084+ftell(fid)));
             % initialize out.data for faster processing.
-            out.data = nan(str2double(out.Rows),str2double(out.Columns),ndim3);
+            out.(datastring) = nan(str2double(out.Rows),str2double(out.Columns),ndim3);
             out.tframe = nan(ndim3,1);
-            out.COP = nan(ndim3,2);
+            out.(copstring) = nan(ndim3,2);
         end
         % go to next frame after all rows are evaluated
         iframe = iframe + frameplus;
@@ -80,15 +89,15 @@ while ~feof(fid) % continue till end of file
         datframe = replace(tline,'","',' ');
         datframe = replace(datframe,',','.');
         datframe(ismember(datframe,'"')) = [];
-        % import a data-row 
-        out.data(irow,:,iframe) = eval(['[',datframe,']']);
+        % import a data-row
+        out.(datastring)(irow,:,iframe) = eval(['[',datframe,']']);
         
         frameplus = 0;
         irow =irow+1;
         if irow > str2double(out.Rows)
             % difference betweeen this timestamp and start of measurement
             out.tframe(iframe) = tnow-tfirst;%seconds from start
-            out.COP(iframe,[1 2]) = COPtmp;
+            out.(copstring)(iframe,[1 2]) = COPtmp;
             irow = 1;
             if disprog
                 % update progressbar
@@ -96,17 +105,10 @@ while ~feof(fid) % continue till end of file
             end
         end
     elseif ~isempty(tline)
-        frameplus = 1;
+%         frameplus = 1;
         if isequal(iframe,0)
-            isplit = find(ismember(tline,':'),1,'first');
-            sstr = [{tline(1:isplit-1)}, {tline(isplit+2:end)}];
-            % get file info (only first run)
-            inp = sstr{1}(~isspace(sstr{1}));
-            % remove ackward symbols
-            inp = inp(~ismember(inp,'()"./²'));
-            out.(inp) = sstr{end}(~isspace(sstr{end}));
-            out.(inp)(ismember(out.(inp),'"')) = [];
-            out.(inp) = replace(out.(inp),',','.');
+            [inp,val] = get_string(tline);
+            out.(inp) = val;
             if isequal(inp,'Time')
                 out.Time(ismember(out.Time,'"')) = [];
                 ttemp = datevec(out.Time,'HH:MM:SS.FFF');
@@ -119,8 +121,31 @@ while ~feof(fid) % continue till end of file
             ttemp = datevec(sstr{end}(~ismember(sstr{end},'"')),'HH:MM:SS.FFF');
             tnow = (3600*ttemp(4)+60*ttemp(5)+ttemp(6));
         end
+        
+        if contains(tline,'Sensor')
+            if isequal(tline(1:6),'Sensor')
+                [~,val] = get_string(tline);
+                sens{end+1} = val;
+                isens = find(ismember(unique(sens),val));
+                switch isens
+                    case 1
+                        datastring = 'data';
+                        copstring = 'COP';
+                        frameplus = 1;
+                        
+                    case 2
+                        datastring = 'data2';
+                        copstring = 'COP2';
+                        if ~isfield(out,datastring)
+                            out.(datastring) = [];
+                        end
+                        frameplus = 0;
+                end
+            end
+        end
+        
         if contains(tline,'COP')
-            % Get the CoP data from frame description lines 
+            % Get the CoP data from frame description lines
             sstr= strsplit(tline,':,');
             % row of CoP
             if contains(tline,'Row')
@@ -137,7 +162,7 @@ while ~feof(fid) % continue till end of file
         end
     end
 end
-
+fclose(fid);
 if disprog
     % update progressbar
     upd(flength)
@@ -147,7 +172,23 @@ if size(out.data,3)>iframe
     out.data(:,:,iframe+1:end) = [];
     out.tframe(iframe+1:end) = [];
     out.COP(iframe+1:end,:) = [];
+    if isfield(out,'data2')
+        out.COP2(iframe+1:end,:) = [];
+        out.data2(:,:,iframe+1:end) = [];
+    end
 end
-fclose(fid);
+
+end
+
+function [inp,val] =  get_string(strval)
+isplit = find(ismember(strval,':'),1,'first');
+sstr = [{strval(1:isplit-1)}, {strval(isplit+2:end)}];
+% get file info (only first run)
+inp = sstr{1}(~isspace(sstr{1}));
+inp = inp(~ismember(inp,'()"./²'));
+val = sstr{end}(~isspace(sstr{end}));
+val(ismember(val,'"')) = [];
+val = replace(val,',','.');
+end
 
 
